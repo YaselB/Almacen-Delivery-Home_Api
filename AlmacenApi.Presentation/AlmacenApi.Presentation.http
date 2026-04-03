@@ -1,0 +1,6 @@
+@AlmacenApi.Presentation_HostAddress = http://localhost:5228
+
+GET {{AlmacenApi.Presentation_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
