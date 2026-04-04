@@ -6,7 +6,7 @@ namespace AlmacenApi.Aplication.Command.Combo.Update;
 public class UpdateComboEntityCommand : UpdateGenericEntityCommand<ComboEntity>
 {
     public required string Name {get ; set;}
-    public required List<ProducwtComboDto> ProductsIds { get; set ;}
+    public required List<ProductComboDto> ProductsIds { get; set ;}
     public required string? AdminId { get ; set;}
     public required string? UserId {get ; set ;}
 }
