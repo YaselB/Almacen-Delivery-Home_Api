@@ -2,12 +2,13 @@ using AlmacenApi.Aplication.Command.Generic.Create;
 using AlmacenApi.Aplication.Common.Errors;
 using AlmacenApi.Aplication.Common.Result_Value;
 using AlmacenApi.Common.Interfaces.Repository.ProductComboRepository;
+using AlmacenApi.Domain.Common.Interfaces.Repository.AdminRepo;
 using AlmacenApi.Domain.Common.Interfaces.Repository.Combo;
 using AlmacenApi.Domain.Common.Interfaces.Repository.Product;
+using AlmacenApi.Domain.Common.Interfaces.Repository.UserRepository;
 using AlmacenApi.Domain.Entities.Combo;
 using AlmacenApi.Domain.Entities.History;
 using AlmacenApi.Domain.Entities.ProductCombo;
-using AlmacenApi.Domain.Repository.Generic;
 using AlmacenApi.Domain.Repository.History;
 using AutoMapper;
 using MediatR;
@@ -22,13 +23,17 @@ public class CreteComboEntityCommandHandler : CreateGenericEntityCommandHandler<
     private readonly IProductRepository productRepository;
     private readonly IProductComboRepository productComboRepository;
     private readonly IHistoryRepository historyRepository;
-    public CreteComboEntityCommandHandler(IComboRepository repository, IMapper mapper , ILogger<ComboEntity> logger , IProductRepository product , IProductComboRepository productComboRepository , IHistoryRepository historyRepository) : base(repository, mapper)
+    private readonly IAdminRepository adminRepository;
+    private readonly IUserRepository userRepository;
+    public CreteComboEntityCommandHandler(IComboRepository repository, IMapper mapper , ILogger<ComboEntity> logger , IProductRepository product , IProductComboRepository productComboRepository , IHistoryRepository historyRepository , IAdminRepository admin , IUserRepository userRepository) : base(repository, mapper)
     {
         comboRepository = repository;
         this.logger = logger;
         productRepository = product;
         this.productComboRepository = productComboRepository;
         this.historyRepository = historyRepository;
+        this.adminRepository = admin;
+        this.userRepository = userRepository;
     }
     public override async Task<Result<Unit>> Handle(CreateComboEntityCommand request, CancellationToken cancellationToken)
     {
@@ -66,11 +71,17 @@ public class CreteComboEntityCommandHandler : CreateGenericEntityCommandHandler<
             }            
             await comboRepository.AddAsync(newCombo , cancellationToken);
             await productComboRepository.AddRange(productCombo , cancellationToken);
+            var adminName = await adminRepository.FindByIdAsync(request.AdminId , cancellationToken);
+            if(adminName == null)
+            {
+                logger.LogWarning("El admin con id : "+request.AdminId+" no se encuentra");
+                return Result<Unit>.Failure(new AdminNotFoundError());
+            }
             var message = "Se ha creado un combo: "+newCombo.Name;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones , newCombo.Name , message);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones , adminName.Username , message);
             await historyRepository.AddAsync(history , cancellationToken);
         }
-        else
+        if(request.UserId != null)
         {
             var newCombo = ComboEntity.Create(request.Name ,null ,request.UserId);
             var productCombo = new List<ProductComboEntity>();
@@ -87,9 +98,15 @@ public class CreteComboEntityCommandHandler : CreateGenericEntityCommandHandler<
             }
             await comboRepository.AddAsync(newCombo ,cancellationToken);
             await productComboRepository.AddRange(productCombo , cancellationToken);
+           var userName = await userRepository.FindByIdAsync(request.UserId , cancellationToken);
+            if(userName == null)
+            {
+                logger.LogWarning("El usuario con id : "+request.UserId+" no se encuentra");
+                return Result<Unit>.Failure(new UserNotFoundError());
+            }
             var message = "Se ha creado un combo: "+newCombo.Name;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones , newCombo.Name , message);
-            await historyRepository.AddAsync(history , cancellationToken);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones , userName.UserName , message);
+            await historyRepository.AddAsync(history , cancellationToken); 
         }
         return Result<Unit>.Success(Unit.Value);
     }

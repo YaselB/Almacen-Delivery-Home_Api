@@ -10,6 +10,7 @@ using AlmacenApi.Presentation.Controller.Generic;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using AlmacenApi.Domain.Common.Permission;
+using AlmacenApi.Aplication.Features.Combo.Dto;
 
 namespace AlmacenApi.Presentation.Controller;
 
@@ -44,11 +45,13 @@ public class ProductController : GenericController<ProductEntity, CreateProductE
     }
     [HttpDelete("{id}")]
     
-    public override async Task<IActionResult> Delete(string id)
+    public async Task<IActionResult> Delete(string id , [FromBody] DeleteProductDto deleteProductDto)
     {
         var command = new DeleteProductEntityCommand
         {
-            Id = id
+            Id = id,
+            AdminId = deleteProductDto.AdminId,
+            UserId = deleteProductDto.UserId
         };
         var result = await mediator.Send(command);
         if(result.IsFailure && result.error != null)

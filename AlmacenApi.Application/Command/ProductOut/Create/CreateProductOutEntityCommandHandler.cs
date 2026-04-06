@@ -2,8 +2,10 @@ using System.Net.Http.Headers;
 using AlmacenApi.Aplication.Command.Generic.Create;
 using AlmacenApi.Aplication.Common.Errors;
 using AlmacenApi.Aplication.Common.Result_Value;
+using AlmacenApi.Domain.Common.Interfaces.Repository.AdminRepo;
 using AlmacenApi.Domain.Common.Interfaces.Repository.Product;
 using AlmacenApi.Domain.Common.Interfaces.Repository.ProductOut;
+using AlmacenApi.Domain.Common.Interfaces.Repository.UserRepository;
 using AlmacenApi.Domain.Entities.History;
 using AlmacenApi.Domain.Entities.Out.ProductOut;
 using AlmacenApi.Domain.Repository.History;
@@ -19,12 +21,16 @@ public class CreateProductOutEntityCommandHandler : CreateGenericEntityCommandHa
     private readonly ILogger<ProductOutEntity> logger;
     private readonly IProductRepository productRepository;
     private readonly IHistoryRepository historyRepository;
-    public CreateProductOutEntityCommandHandler(IProductOutRepository repository, IMapper mapper , ILogger<ProductOutEntity> logger , IProductRepository product , IHistoryRepository historyRepository) : base(repository, mapper)
+    private readonly IUserRepository user;
+    private readonly IAdminRepository admin;
+    public CreateProductOutEntityCommandHandler(IProductOutRepository repository, IMapper mapper , ILogger<ProductOutEntity> logger , IProductRepository product , IHistoryRepository historyRepository , IUserRepository userRepository , IAdminRepository adminRepository) : base(repository, mapper)
     {
         productOutRepository = repository;
         this.logger = logger;
         productRepository = product;
         this.historyRepository = historyRepository;
+        user = userRepository;
+        admin = adminRepository;
     }
     public override async Task<Result<Unit>> Handle(CreateProductOutEntityCommand request, CancellationToken cancellationToken)
     {
@@ -45,8 +51,14 @@ public class CreateProductOutEntityCommandHandler : CreateGenericEntityCommandHa
             var productOut = ProductOutEntity.Create(null ,request.AdminId , product.name ,request.Quantity ,request.OutMotive ,product.id ,request.Customer);
             await productOutRepository.AddAsync(productOut, cancellationToken);
             await productRepository.UpdateAsync(product , cancellationToken);
-            var message = "Se le ha dado salida al producto: "+product.name;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Entrada ,product.name , message);
+            var adminEntity = await admin.FindByIdAsync(request.AdminId , cancellationToken);
+            if(adminEntity == null)
+            {
+                logger.LogWarning("El admin con id: "+request.AdminId+" no se encuentra");
+                return Result<Unit>.Failure(new AdminNotFoundError());
+            }
+            var message = "Se le ha dado salida al producto: "+product.name+" a una cantidad de: "+request.Quantity;
+            var history = HistoryEntity.Create(HistoryEntity.Type.Salida ,adminEntity.Username , message);
             await historyRepository.AddAsync(history , cancellationToken);
         }
         if(request.UserId != null)
@@ -54,8 +66,14 @@ public class CreateProductOutEntityCommandHandler : CreateGenericEntityCommandHa
             var productOut = ProductOutEntity.Create(request.UserId ,null , product.name ,request.Quantity ,request.OutMotive ,product.id , request.Customer);
             await productOutRepository.AddAsync(productOut, cancellationToken);
             await productRepository.UpdateAsync(product , cancellationToken);
-            var message = "Se le ha dado salida al producto: "+product.name;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Salida ,product.name , message);
+            var userEntity = await user.FindByIdAsync(request.UserId , cancellationToken);
+            if(userEntity == null)
+            {
+                logger.LogWarning("El usuario con id: "+request.UserId+" no se encuentra");
+                return Result<Unit>.Failure(new UserNotFoundError());
+            }
+            var message = "Se le ha dado salida al producto: "+product.name+" a una cantidad de: "+request.Quantity;
+            var history = HistoryEntity.Create(HistoryEntity.Type.Salida ,userEntity.UserName , message);
             await historyRepository.AddAsync(history , cancellationToken);
         }
         return Result<Unit>.Success(Unit.Value);

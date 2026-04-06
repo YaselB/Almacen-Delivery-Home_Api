@@ -47,17 +47,7 @@ namespace AlmacenApi.Presentation.Controller.Generic
             return Ok(result.Value);
         }
 
-        [HttpDelete("{id}")]
-        public virtual async Task<IActionResult> Delete(string id)
-        {
-            var command = new DeleteGenericEntityCommand<TEntity> { Id = id };
-            var result = await mediator.Send(command);
-            if (result.IsFailure)
-            {
-                return NotFound(result.error);
-            }
-            return Ok(result.Value);
-        }
+        
 
         [HttpGet("{id}")]
         public virtual async Task<IActionResult> GetById(string id)

@@ -2,9 +2,11 @@ using AlmacenApi.Aplication.Command.Generic.Create;
 using AlmacenApi.Aplication.Common.Errors;
 using AlmacenApi.Aplication.Common.Result_Value;
 using AlmacenApi.Domain.ComboOutDtoClass;
+using AlmacenApi.Domain.Common.Interfaces.Repository.AdminRepo;
 using AlmacenApi.Domain.Common.Interfaces.Repository.Combo;
 using AlmacenApi.Domain.Common.Interfaces.Repository.ComboOut;
 using AlmacenApi.Domain.Common.Interfaces.Repository.Product;
+using AlmacenApi.Domain.Common.Interfaces.Repository.UserRepository;
 using AlmacenApi.Domain.Entities.CombOut;
 using AlmacenApi.Domain.Entities.History;
 using AlmacenApi.Domain.Repository.History;
@@ -14,7 +16,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AlmacenApi.Aplication.Command.ComboOut.Create;
 
-public class CreateComboOutEntityCommandHandler 
+public class CreateComboOutEntityCommandHandler
     : CreateGenericEntityCommandHandler<ComboOutEntity, CreateComboOutEntityCommand>
 {
     private readonly IComboOutRepository comboOutRepository;
@@ -22,6 +24,8 @@ public class CreateComboOutEntityCommandHandler
     private readonly IProductRepository productRepository;
     private readonly ILogger<ComboOutEntity> logger;
     private readonly IHistoryRepository historyRepository;
+    private readonly IAdminRepository admin;
+    private readonly IUserRepository user;
 
     public CreateComboOutEntityCommandHandler(
         IComboOutRepository repository,
@@ -29,7 +33,9 @@ public class CreateComboOutEntityCommandHandler
         ILogger<ComboOutEntity> logger,
         IProductRepository product,
         IComboRepository combo,
-        IHistoryRepository historyRepository)
+        IHistoryRepository historyRepository,
+        IAdminRepository adminRepository,
+        IUserRepository userRepository)
         : base(repository, mapper)
     {
         this.comboOutRepository = repository;
@@ -37,6 +43,8 @@ public class CreateComboOutEntityCommandHandler
         this.productRepository = product;
         this.logger = logger;
         this.historyRepository = historyRepository;
+        admin = adminRepository;
+        user = userRepository;
     }
 
     public override async Task<Result<Unit>> Handle(CreateComboOutEntityCommand request, CancellationToken cancellationToken)
@@ -111,12 +119,30 @@ public class CreateComboOutEntityCommandHandler
         );
 
         await comboOutRepository.AddAsync(newComboOut, cancellationToken);
-
-        // 7. Registrar en historial
-        var message = $"Se ha creado una salida personalizada para el combo: {combo.Name}";
-        var history = HistoryEntity.Create(HistoryEntity.Type.Salida, combo.Name, message);
-        await historyRepository.AddAsync(history, cancellationToken);
-
+        if (request.AdminId != null)
+        {
+            var adminEntity = await admin.FindByIdAsync(request.AdminId, cancellationToken);
+            if (adminEntity == null)
+            {
+                logger.LogWarning("El admin con id: " + request.AdminId + " no se encuentra");
+                return Result<Unit>.Failure(new AdminNotFoundError());
+            }
+            var message = $"Se ha creado una salida personalizada para el combo: {combo.Name}";
+            var history = HistoryEntity.Create(HistoryEntity.Type.Salida, adminEntity.Username, message);
+            await historyRepository.AddAsync(history, cancellationToken);
+        }
+        if(request.UserId != null)
+        {
+            var userEntity = await user.FindByIdAsync(request.UserId , cancellationToken);
+            if(userEntity == null)
+            {
+                logger.LogWarning("El usuario con id: "+request.UserId+" no e encuentra");
+                return Result<Unit>.Failure(new UserNotFoundError());
+            }
+            var message = $"Se ha creado una salida personalizada para el combo: {combo.Name}";
+            var history = HistoryEntity.Create(HistoryEntity.Type.Salida, userEntity.UserName, message);
+            await historyRepository.AddAsync(history, cancellationToken);
+        }
         return Result<Unit>.Success(Unit.Value);
     }
 }

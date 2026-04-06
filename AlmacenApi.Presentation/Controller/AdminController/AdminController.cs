@@ -72,7 +72,7 @@ namespace AlmacenApi.Presentation.Controller.AdminController
         }
 
         [HttpDelete("{id}")]
-        public override async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             var command = new DeleteAdminEntityCommand { Id = id };
             var result = await mediator.Send(command);

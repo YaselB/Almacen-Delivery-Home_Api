@@ -39,11 +39,13 @@ public class ComboController : GenericController<ComboEntity, CreateComboEntityC
         return Ok(result.Value);
     }
     [HttpDelete("{id}")]
-    public override async Task<IActionResult> Delete(string id)
+    public async Task<IActionResult> Delete(string id ,[FromBody] DeleteProductDto deleteProductDto)
     {
         var command = new DeleteComboEntityCommand
         {
-            Id = id
+            Id = id,
+            AdminId = deleteProductDto.AdminId,
+            UserId = deleteProductDto.UserId
         };
         var result = await mediator.Send(command);
         if(result.IsFailure && result.error != null)

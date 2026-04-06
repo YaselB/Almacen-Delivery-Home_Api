@@ -44,7 +44,7 @@ public class UserController : GenericController<UserEntity, CreateUserEntityComm
     }
     [HttpDelete("{id}")]
     [RequiredPermissionAtribute(Permissions.DeleteUserPermission)]
-    public override async Task<IActionResult> Delete(string id)
+    public async Task<IActionResult> Delete(string id)
     {
         var DeleteEntityCommand = new DeleteUserEntityCommand{Id = id};
         var result = await mediator.Send(DeleteEntityCommand);
