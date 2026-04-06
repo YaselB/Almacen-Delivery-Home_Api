@@ -46,6 +46,7 @@ public class CreateProductOutEntityCommandHandler : CreateGenericEntityCommandHa
             return Result<Unit>.Failure(new InsuficientProductStockError());
         }
         product.Quantity -= request.Quantity;
+        var result = request.Quantity - product.Quantity;
         if(request.AdminId != null)
         {
             var productOut = ProductOutEntity.Create(null ,request.AdminId , product.name ,request.Quantity ,request.OutMotive ,product.id ,request.Customer);
@@ -57,7 +58,7 @@ public class CreateProductOutEntityCommandHandler : CreateGenericEntityCommandHa
                 logger.LogWarning("El admin con id: "+request.AdminId+" no se encuentra");
                 return Result<Unit>.Failure(new AdminNotFoundError());
             }
-            var message = "Se le ha dado salida al producto: "+product.name+" a una cantidad de: "+request.Quantity;
+            var message = "Se le ha dado salida al producto: "+product.name+" a una cantidad de: "+result;
             var history = HistoryEntity.Create(HistoryEntity.Type.Salida ,adminEntity.Username , message);
             await historyRepository.AddAsync(history , cancellationToken);
         }
@@ -72,7 +73,7 @@ public class CreateProductOutEntityCommandHandler : CreateGenericEntityCommandHa
                 logger.LogWarning("El usuario con id: "+request.UserId+" no se encuentra");
                 return Result<Unit>.Failure(new UserNotFoundError());
             }
-            var message = "Se le ha dado salida al producto: "+product.name+" a una cantidad de: "+request.Quantity;
+            var message = "Se le ha dado salida al producto: "+product.name+" a una cantidad de: "+result;
             var history = HistoryEntity.Create(HistoryEntity.Type.Salida ,userEntity.UserName , message);
             await historyRepository.AddAsync(history , cancellationToken);
         }

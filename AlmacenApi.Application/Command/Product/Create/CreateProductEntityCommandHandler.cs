@@ -46,7 +46,7 @@ public class CreateProductEntityCommandHandler : CreateGenericEntityCommandHandl
                 logger.LogWarning("El usuario con id: "+command.UserId+" no se encuentra");
                 return Result<Unit>.Failure(new UserNotFoundError());
             }
-            var message = "Se ha creado un nuevo producto: "+product.name;
+            var message = "Se ha creado un nuevo producto: "+product.name+" con un cantidad de: "+product.Quantity+product.Unity;
             var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones ,userEntity.UserName ,message);
             await historyRepository.AddAsync(history , cancellationToken);
         }
