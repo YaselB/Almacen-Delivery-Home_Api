@@ -15,6 +15,7 @@ public class ProductEntity : GenericEntity<ProductEntity>
     public int Quantity { get ; set ;}
     public string Unity { get; set ; } = string.Empty;
     public string Category {get ; set ; } = string.Empty;
+    public string Provider {get ; set;} = string.Empty;
     public List<DateTime> EndDate {get ; set ;} = new List<DateTime>();
     public string? CreateByUser {get ; set ;}
     public string? CreateByAdmin {get ; set ;}
@@ -25,14 +26,15 @@ public class ProductEntity : GenericEntity<ProductEntity>
     public List<ProductComboEntity>? ProductCombos {get ; set ;}
     public ICollection<ProductOutEntity>? ProductOut {get ; set ;}
 
-    public static ProductEntity Create(string? userId , string? AdminId , string name , int Quantity , string unity ,DateTime endDate , string Category)
+    public static ProductEntity Create(string? userId , string? AdminId , string name , int Quantity , string unity ,DateTime endDate , string Category , string Provider)
     {
         var product = new ProductEntity
         {
             name = name,
             Quantity = Quantity,
             Unity = unity,
-            Category = Category
+            Category = Category,
+            Provider = Provider,
         };
         product.EndDate.Add(endDate);
         if(userId != null)
@@ -47,7 +49,7 @@ public class ProductEntity : GenericEntity<ProductEntity>
         product.AddDomainEvent(CreateProductDomainEvent);
         return product;
     }
-    public void Update(int Quantity , DateTime? endDate , string ? Admin , string ? UserId)
+    public void Update(int Quantity , DateTime? endDate , string ? Admin , string ? UserId , string Provider)
     {
         this.Quantity = Quantity;
         if(endDate != null){
@@ -64,6 +66,7 @@ public class ProductEntity : GenericEntity<ProductEntity>
             this.CreateByAdmin = null;
         }
         this.UpdatedAt = DateTime.UtcNow;
+        this.Provider = Provider;
         var UpdateProductDomainEvent = new ProductUpdateEvent(this.id ,this.name);
         this.AddDomainEvent(UpdateProductDomainEvent);
     }

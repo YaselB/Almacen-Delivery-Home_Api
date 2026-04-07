@@ -9,5 +9,6 @@ public class ProductResultDto
     public required DateTime endDate { get ; set ;}
     public required string? NameUserorAdmin {get ; set ;}
     public required string Category { get ; set ;}
+    public required string Provider {get ; set ;}
     
 }

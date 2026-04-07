@@ -38,7 +38,7 @@ public class CreateProductEntityCommandHandler : CreateGenericEntityCommandHandl
         }
         if(command.UserId != null)
         {
-            var product = ProductEntity.Create(command.UserId ,null ,command.ProductName ,command.Quantity ,command.Unity ,command.endDate , command.Category);
+            var product = ProductEntity.Create(command.UserId ,null ,command.ProductName ,command.Quantity ,command.Unity ,command.endDate , command.Category , command.Provider);
             await productRepository.AddAsync(product ,cancellationToken);
             var userEntity = await user.FindByIdAsync(command.UserId , cancellationToken);
             if(userEntity == null)
@@ -46,13 +46,13 @@ public class CreateProductEntityCommandHandler : CreateGenericEntityCommandHandl
                 logger.LogWarning("El usuario con id: "+command.UserId+" no se encuentra");
                 return Result<Unit>.Failure(new UserNotFoundError());
             }
-            var message = "Se ha creado un nuevo producto: "+product.name+" con un cantidad de: "+product.Quantity+product.Unity;
+            var message = "Se ha creado un nuevo producto: "+product.name+" con un cantidad de: "+product.Quantity+product.Unity+" por el proveedor:"+command.Provider;
             var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones ,userEntity.UserName ,message);
             await historyRepository.AddAsync(history , cancellationToken);
         }
         if(command.AdminId != null)
         {
-            var product = ProductEntity.Create(null , command.AdminId , command.ProductName , command.Quantity ,command.Unity ,command.endDate , command.Category);
+            var product = ProductEntity.Create(null , command.AdminId , command.ProductName , command.Quantity ,command.Unity ,command.endDate , command.Category , command.Provider);
             await productRepository.AddAsync(product ,cancellationToken);
             var adminEntity = await admin.FindByIdAsync(command.AdminId , cancellationToken);
             if(adminEntity == null)
@@ -60,7 +60,7 @@ public class CreateProductEntityCommandHandler : CreateGenericEntityCommandHandl
                 logger.LogWarning("El admin con id: "+command.AdminId+" no se encuentra");
                 return Result<Unit>.Failure(new AdminNotFoundError());
             }
-            var message = "Se ha creado un nuevo producto: "+product.name+" con un cantidad de: "+product.Quantity+product.Unity;
+            var message = "Se ha creado un nuevo producto: "+product.name+" con un cantidad de: "+product.Quantity+product.Unity+" por el proveedor: "+command.Provider;
             var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones ,adminEntity.Username ,message);
             await historyRepository.AddAsync(history , cancellationToken);
         }

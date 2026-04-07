@@ -35,7 +35,8 @@ public class GetProductEntityByIdQueryHandler : GetGenericEntityByIdQueryHandler
                 NameUserorAdmin = null,
                 Quantity = product.Quantity,
                 Unity = product.Unity,
-                Category = product.Category
+                Category = product.Category,
+                Provider = product.Provider
             };
         
         if(product.CreateByAdmin != null)

@@ -59,7 +59,7 @@ public class UpdateProductEntityCommandHandler : UpdateGenericEntityCommandHandl
         }
         if (command.AdminId != null)
         {
-            product.Update(command.Quantity, command.endDate, command.AdminId, null);
+            product.Update(command.Quantity, command.endDate, command.AdminId, null , command.Provider);
             var adminEntity = await user.FindByIdAsync(command.AdminId, cancellationToken);
             if (adminEntity == null)
             {
@@ -67,13 +67,13 @@ public class UpdateProductEntityCommandHandler : UpdateGenericEntityCommandHandl
                 return Result<Unit>.Failure(new UserNotFoundError());
             }
             await productRepository.UpdateAsync(product, cancellationToken);
-            var message = "se ha agregado una nueva cantidad del producto: " + product.name+" ,"+command.Quantity+product.Unity;
+            var message = "se ha agregado una nueva cantidad del producto: " + product.name+" ,"+command.Quantity+product.Unity+" por el proveedor:"+command.Provider;
             var history = HistoryEntity.Create(HistoryEntity.Type.Entrada, adminEntity.UserName, message);
             await historyRepository.AddAsync(history, cancellationToken);
         }
         if(command.UserId != null)
         {
-            product.Update(command.Quantity, command.endDate, null, command.UserId);
+            product.Update(command.Quantity, command.endDate, null, command.UserId , command.Provider);
             var userEntity = await user.FindByIdAsync(command.UserId ,cancellationToken);
             if(userEntity == null)
             {
@@ -81,7 +81,7 @@ public class UpdateProductEntityCommandHandler : UpdateGenericEntityCommandHandl
                 return Result<Unit>.Failure(new AdminNotFoundError());
             }
             await productRepository.UpdateAsync(product, cancellationToken);
-            var message = "se ha agregado una nueva cantidad del producto: " + product.name+" ,"+command.Quantity+product.Unity;
+            var message = "se ha agregado una nueva cantidad del producto: " + product.name+" ,"+command.Quantity+product.Unity+" por el proveedor:"+command.Provider;
             var history = HistoryEntity.Create(HistoryEntity.Type.Entrada, userEntity.UserName, message);
             await historyRepository.AddAsync(history, cancellationToken);
         }
