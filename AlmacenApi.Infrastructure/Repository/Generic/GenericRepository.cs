@@ -10,7 +10,6 @@ namespace AlmacenApi.Infrastructure.Repository.Generic
         protected readonly AppDBContext _context;
         protected readonly DbSet<T> _dbSet;
 
-        // ✅ Recibe DbContext, no DbSet
         public GenericRepository(AppDBContext context)
         {
             _context = context;

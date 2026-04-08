@@ -21,9 +21,9 @@ public class GetAllComboEntityQueryHandler : GetAllGenericEntityQueryHandler<Com
     {
         var combos = await comboRepository.FindALlAsync(cancellationToken);
         var combosBack = new List<ComboResultDto>();
-        var productComboResult = new List<ProductcomboResultDto>();
         foreach(var i in combos)
         {
+            var productComboResult = new List<ProductcomboResultDto>();
             var productCombo = await productComboRepository.GetProductsOfTheCombo(i.id ,cancellationToken);
             foreach(var j in productCombo)
             {
