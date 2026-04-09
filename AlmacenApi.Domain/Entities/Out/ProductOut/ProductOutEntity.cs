@@ -8,7 +8,7 @@ namespace AlmacenApi.Domain.Entities.Out.ProductOut;
 public class ProductOutEntity : GenericEntity<ProductOutEntity>
 {
     public string ProductName {get ; set ;} = string.Empty;
-    public int Quantity {get ; set ;}
+    public double Quantity {get ; set ;}
     public string OutMotive {get ; set ;} = string.Empty;
     public string? AdminId {get; set;}
     public string? UserId {get; set ;}
@@ -17,7 +17,7 @@ public class ProductOutEntity : GenericEntity<ProductOutEntity>
     public UserEntity? User {get ; set ;}
     public AdminEntity? Admin {get ; set ;}
     public ProductEntity? Product {get ; set ;}
-    public static ProductOutEntity Create(string? UserId , string? AdminId , string ProductName ,int Quantity , string OutMotive , string ProductId , string? Customer)
+    public static ProductOutEntity Create(string? UserId , string? AdminId , string ProductName ,double Quantity , string OutMotive , string ProductId , string? Customer)
     {
         var productOutEntity = new ProductOutEntity
         {

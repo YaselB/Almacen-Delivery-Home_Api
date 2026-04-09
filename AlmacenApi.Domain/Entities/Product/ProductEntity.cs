@@ -12,7 +12,7 @@ namespace AlmacenApi.Domain.Entities.Product;
 public class ProductEntity : GenericEntity<ProductEntity>
 {
     public string name{ get; set ;} = string.Empty;
-    public int Quantity { get ; set ;}
+    public double Quantity { get ; set ;}
     public string Unity { get; set ; } = string.Empty;
     public string Category {get ; set ; } = string.Empty;
     public string Provider {get ; set;} = string.Empty;

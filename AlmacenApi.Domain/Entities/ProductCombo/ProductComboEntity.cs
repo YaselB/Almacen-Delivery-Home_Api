@@ -10,8 +10,8 @@ public class ProductComboEntity : GenericEntity<ProductComboEntity>
     public ComboEntity ? comboEntity {get ; set ;}
     public ProductEntity ? ProductEntity {get ; set ;}
     public string ProductId { get ; set ;} = string.Empty;
-    public int Quantity {get ; set ;} 
-    public static ProductComboEntity Create(string ComboId , string ProductId ,int quantity)
+    public double Quantity {get ; set ;} 
+    public static ProductComboEntity Create(string ComboId , string ProductId ,double quantity)
     {
         return new ProductComboEntity
         {

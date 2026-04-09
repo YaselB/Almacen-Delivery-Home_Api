@@ -64,7 +64,7 @@ public class CreateProductOutEntityCommandHandler : CreateGenericEntityCommandHa
         }
         foreach (var i in products)
         {
-            int QuantityToQuit = request.Products.Where(o => o.Id == i.id).Select(e => e.Quantity).FirstOrDefault();
+            double QuantityToQuit = request.Products.Where(o => o.Id == i.id).Select(e => e.Quantity).FirstOrDefault();
             if (i.Quantity < QuantityToQuit)
             {
                 logger.LogWarning("El producto: " + i.name + " no se encuentra");
@@ -75,7 +75,7 @@ public class CreateProductOutEntityCommandHandler : CreateGenericEntityCommandHa
         var newProducts = new List<ProductOutEntity>();
         foreach (var i in products)
         {
-            int QuantityToQuit = request.Products.Where(o => o.Id == i.id).Select(e => e.Quantity).FirstOrDefault();
+            double QuantityToQuit = request.Products.Where(o => o.Id == i.id).Select(e => e.Quantity).FirstOrDefault();
             i.Quantity -= QuantityToQuit;
             await productRepository.UpdateAsync(i, cancellationToken);
             ProductsAndQuantitiesMessage += "Producto: " + i.name + " , cantidad: " + QuantityToQuit + "\n";

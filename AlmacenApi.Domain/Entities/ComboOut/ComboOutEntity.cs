@@ -16,7 +16,7 @@ public class ComboOutEntity : GenericEntity<ComboOutEntity>
     public string? UserId { get; set; }
     public string? Customer { get; set; }
     public List<string>? ProductsId { get; set; }
-    public List<int>? Quantity { get; set; }
+    public List<double>? Quantity { get; set; }
     public ComboEntity? Combo { get; set; }
     public AdminEntity? Admin { get; set; }
     public UserEntity? User { get; set; }
@@ -32,7 +32,7 @@ public class ComboOutEntity : GenericEntity<ComboOutEntity>
         if (ComboUpdate != null && ComboUpdate.Count > 0)
         {
             comboOut.ProductsId = new List<string>();
-            comboOut.Quantity = new List<int>();
+            comboOut.Quantity = new List<double>();
 
             foreach (var item in ComboUpdate)
             {

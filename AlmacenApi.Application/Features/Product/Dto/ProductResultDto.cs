@@ -4,7 +4,7 @@ public class ProductResultDto
 {
     public required string id {get;set;}
     public required string name{get ;set ;}
-    public required int Quantity {get; set ;}
+    public required double Quantity {get; set ;}
     public required string Unity { get; set ;}
     public required DateTime endDate { get ; set ;}
     public required string? NameUserorAdmin {get ; set ;}
