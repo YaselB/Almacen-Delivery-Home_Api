@@ -47,7 +47,7 @@ public class CreateUserEntityCommandHandler : CreateGenericEntityCommandHandler<
         var newUser = UserEntity.Create(command.FullName , command.UserName , hash);
         await userRepository.AddAsync(newUser , cancellationToken);
         var message = "Se ha creado un nuveo usuario: "+newUser.UserName;
-        var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones , newUser.UserName , message);
+        var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones , newUser.UserName , message , null);
         await historyRepository.AddAsync(history , cancellationToken);
         return Result<Unit>.Success(Unit.Value);
     }

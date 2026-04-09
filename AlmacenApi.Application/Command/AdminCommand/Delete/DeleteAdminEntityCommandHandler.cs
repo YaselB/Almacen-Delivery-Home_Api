@@ -53,7 +53,7 @@ public class DeleteAdminEntityCommandHandler : DeleteGenericEntityCommandHandler
         admin.AddDomainEvent(adminDeleteEvent);
         await adminRepository.RemoveAsync(admin , cancellationToken);
         var message = "Se ha eliminado el admin: "+admin.Username;
-        var history = HistoryEntity.Create(HistoryEntity.Type.Eliminaciones , admin.Username , message);
+        var history = HistoryEntity.Create(HistoryEntity.Type.Eliminaciones , admin.Username , message , null);
         await historyRepository.AddAsync(history , cancellationToken);
         return Result<Unit>.Success(Unit.Value);
     }

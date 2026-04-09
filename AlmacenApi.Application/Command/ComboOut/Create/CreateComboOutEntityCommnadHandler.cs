@@ -127,20 +127,30 @@ public class CreateComboOutEntityCommandHandler
                 logger.LogWarning("El admin con id: " + request.AdminId + " no se encuentra");
                 return Result<Unit>.Failure(new AdminNotFoundError());
             }
-            var message = $"Se ha creado una salida personalizada para el combo: {combo.Name}";
-            var history = HistoryEntity.Create(HistoryEntity.Type.Salida, adminEntity.Username, message);
+            var message = $"Se ha creado una salida personalizada para el combo: {combo.Name}\n";
+            message += "para el cliente:" + request.Customer + "\n Motivo de la salida: " + request.OutMotive;
+            var comboOutDateUtc = request.ComboOutDate.Kind == DateTimeKind.Utc
+    ? request.ComboOutDate
+    : DateTime.SpecifyKind(request.ComboOutDate, DateTimeKind.Utc);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Salida, adminEntity.Username, message, comboOutDateUtc);
             await historyRepository.AddAsync(history, cancellationToken);
         }
-        if(request.UserId != null)
+        if (request.UserId != null)
         {
-            var userEntity = await user.FindByIdAsync(request.UserId , cancellationToken);
-            if(userEntity == null)
+            var userEntity = await user.FindByIdAsync(request.UserId, cancellationToken);
+            if (userEntity == null)
             {
-                logger.LogWarning("El usuario con id: "+request.UserId+" no e encuentra");
+                logger.LogWarning("El usuario con id: " + request.UserId + " no e encuentra");
                 return Result<Unit>.Failure(new UserNotFoundError());
             }
-            var message = $"Se ha creado una salida personalizada para el combo: {combo.Name}";
-            var history = HistoryEntity.Create(HistoryEntity.Type.Salida, userEntity.UserName, message);
+            var message = $"Se ha creado una salida personalizada para el combo: {combo.Name}\n";
+            message += "para el cliente:" + request.Customer + "\n Motivo de la salida: " + request.OutMotive;
+            var comboOutDateUtc = request.ComboOutDate.Kind == DateTimeKind.Utc
+    ? request.ComboOutDate
+    : DateTime.SpecifyKind(request.ComboOutDate, DateTimeKind.Utc);
+            logger.LogWarning(comboOutDateUtc.ToString());
+            var history = HistoryEntity.Create(HistoryEntity.Type.Salida, userEntity.UserName, message, comboOutDateUtc);
+            logger.LogWarning(history.CreatedAt.ToString());
             await historyRepository.AddAsync(history, cancellationToken);
         }
         return Result<Unit>.Success(Unit.Value);

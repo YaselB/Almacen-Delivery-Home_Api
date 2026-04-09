@@ -48,7 +48,7 @@ public class DeleteProductEntityCommandHandler : DeleteGenericEntityCommandHandl
                 return Result<Unit>.Failure(new AdminNotFoundError());
             }
             var message = "Se ha eliminado el producto: " + product.name;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Eliminaciones, adminEntity.Username , message);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Eliminaciones, adminEntity.Username , message , null);
             await historyRepository.AddAsync(history, cancellationToken);
         }
         if(request.UserId != null)
@@ -60,7 +60,7 @@ public class DeleteProductEntityCommandHandler : DeleteGenericEntityCommandHandl
                 return Result<Unit>.Failure(new UserNotFoundError());
             }
             var message = "Se ha eliminado el producto: " + product.name;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Eliminaciones, userEntity.UserName , message);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Eliminaciones, userEntity.UserName , message , null);
             await historyRepository.AddAsync(history, cancellationToken);
         }
         return Result<Unit>.Success(Unit.Value);

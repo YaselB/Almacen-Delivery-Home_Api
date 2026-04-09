@@ -1,4 +1,3 @@
-using System.Net.Http.Headers;
 using AlmacenApi.Aplication.Command.Generic.Create;
 using AlmacenApi.Aplication.Common.Errors;
 using AlmacenApi.Aplication.Common.Result_Value;
@@ -23,7 +22,7 @@ public class CreateProductOutEntityCommandHandler : CreateGenericEntityCommandHa
     private readonly IHistoryRepository historyRepository;
     private readonly IUserRepository user;
     private readonly IAdminRepository admin;
-    public CreateProductOutEntityCommandHandler(IProductOutRepository repository, IMapper mapper , ILogger<ProductOutEntity> logger , IProductRepository product , IHistoryRepository historyRepository , IUserRepository userRepository , IAdminRepository adminRepository) : base(repository, mapper)
+    public CreateProductOutEntityCommandHandler(IProductOutRepository repository, IMapper mapper, ILogger<ProductOutEntity> logger, IProductRepository product, IHistoryRepository historyRepository, IUserRepository userRepository, IAdminRepository adminRepository) : base(repository, mapper)
     {
         productOutRepository = repository;
         this.logger = logger;
@@ -34,49 +33,64 @@ public class CreateProductOutEntityCommandHandler : CreateGenericEntityCommandHa
     }
     public override async Task<Result<Unit>> Handle(CreateProductOutEntityCommand request, CancellationToken cancellationToken)
     {
-        var product = await productRepository.FindByIdAsync(request.ProductId , cancellationToken);
-        if(product == null)
+        logger.LogWarning(request.ProductOutDate.ToString());
+        var productsIds = request.Products.Select(e => e.Id).ToList();
+        var products = await productRepository.GetProductsByIds(productsIds, cancellationToken);
+        string UserNameOrAdminName = "";
+        if (request.AdminId != null)
         {
-            logger.LogWarning("Ese producto no esta registrado");
-            return Result<Unit>.Failure(new ProductNotFoundError());
-        }
-        if(request.Quantity > product.Quantity)
-        {
-            logger.LogWarning("No se puede cumplir con el pedido porque no hay suficiente en stock ");
-            return Result<Unit>.Failure(new InsuficientProductStockError());
-        }
-        product.Quantity -= request.Quantity;
-        var result = request.Quantity - product.Quantity;
-        if(request.AdminId != null)
-        {
-            var productOut = ProductOutEntity.Create(null ,request.AdminId , product.name ,request.Quantity ,request.OutMotive ,product.id ,request.Customer);
-            await productOutRepository.AddAsync(productOut, cancellationToken);
-            await productRepository.UpdateAsync(product , cancellationToken);
-            var adminEntity = await admin.FindByIdAsync(request.AdminId , cancellationToken);
-            if(adminEntity == null)
+            var adminName = await admin.FindByIdAsync(request.AdminId, cancellationToken);
+            if (adminName == null)
             {
-                logger.LogWarning("El admin con id: "+request.AdminId+" no se encuentra");
+                logger.LogWarning("El admin que se envio ,no existe");
                 return Result<Unit>.Failure(new AdminNotFoundError());
             }
-            var message = "Se le ha dado salida al producto: "+product.name+" a una cantidad de: "+result;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Salida ,adminEntity.Username , message);
-            await historyRepository.AddAsync(history , cancellationToken);
+            UserNameOrAdminName = adminName.Username;
         }
-        if(request.UserId != null)
+        if (request.UserId != null)
         {
-            var productOut = ProductOutEntity.Create(request.UserId ,null , product.name ,request.Quantity ,request.OutMotive ,product.id , request.Customer);
-            await productOutRepository.AddAsync(productOut, cancellationToken);
-            await productRepository.UpdateAsync(product , cancellationToken);
-            var userEntity = await user.FindByIdAsync(request.UserId , cancellationToken);
-            if(userEntity == null)
+            var userName = await user.FindByIdAsync(request.UserId, cancellationToken);
+            if (userName == null)
             {
-                logger.LogWarning("El usuario con id: "+request.UserId+" no se encuentra");
+                logger.LogWarning("El usuario que se envio no existe");
                 return Result<Unit>.Failure(new UserNotFoundError());
             }
-            var message = "Se le ha dado salida al producto: "+product.name+" a una cantidad de: "+result;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Salida ,userEntity.UserName , message);
-            await historyRepository.AddAsync(history , cancellationToken);
+            UserNameOrAdminName = userName.UserName;
         }
+        if (products.Count != productsIds.Count)
+        {
+            logger.LogWarning("Hay productos que no se encuentran ");
+            return Result<Unit>.Failure(new ProductsByIdsNotFoundError());
+        }
+        foreach (var i in products)
+        {
+            int QuantityToQuit = request.Products.Where(o => o.Id == i.id).Select(e => e.Quantity).FirstOrDefault();
+            if (i.Quantity < QuantityToQuit)
+            {
+                logger.LogWarning("El producto: " + i.name + " no se encuentra");
+                return Result<Unit>.Failure(new InsuficientStockOfProductT(i.name));
+            }
+        }
+        string ProductsAndQuantitiesMessage = "Salida de Productos\n";
+        var newProducts = new List<ProductOutEntity>();
+        foreach (var i in products)
+        {
+            int QuantityToQuit = request.Products.Where(o => o.Id == i.id).Select(e => e.Quantity).FirstOrDefault();
+            i.Quantity -= QuantityToQuit;
+            await productRepository.UpdateAsync(i, cancellationToken);
+            ProductsAndQuantitiesMessage += "Producto: " + i.name + " , cantidad: " + QuantityToQuit + "\n";
+            var ProductOut = ProductOutEntity.Create(request.UserId, request.AdminId, i.name, QuantityToQuit, request.OutMotive, i.id, request.Customer);
+            newProducts.Add(ProductOut);
+        }
+        ProductsAndQuantitiesMessage += "Cliente: " + request.Customer + "\n" + "Motivo de Salida: " + request.OutMotive;
+        await productOutRepository.AddRange(newProducts, cancellationToken);
+        var productOutDateUtc = request.ProductOutDate.Kind == DateTimeKind.Utc
+    ? request.ProductOutDate
+    : DateTime.SpecifyKind(request.ProductOutDate, DateTimeKind.Utc);
+    logger.LogWarning(productOutDateUtc.ToString());
+        var history = HistoryEntity.Create(HistoryEntity.Type.Salida, UserNameOrAdminName, ProductsAndQuantitiesMessage, productOutDateUtc);
+        logger.LogWarning(history.CreatedAt.ToString());
+        await historyRepository.AddAsync(history, cancellationToken);
         return Result<Unit>.Success(Unit.Value);
     }
 }

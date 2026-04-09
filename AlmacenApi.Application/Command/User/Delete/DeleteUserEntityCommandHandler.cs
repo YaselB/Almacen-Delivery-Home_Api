@@ -53,7 +53,7 @@ public class DeleteUserEntityCommandHandler : DeleteGenericEntityCommandHandler<
         user.AddDomainEvent(DeleteUserDomainEvent);
         await userRepository.RemoveAsync(user , cancellationToken);
         var message = "Se ha eliminado el usuario: "+user.UserName;
-        var history = HistoryEntity.Create(HistoryEntity.Type.Eliminaciones , user.UserName ,message);
+        var history = HistoryEntity.Create(HistoryEntity.Type.Eliminaciones , user.UserName ,message , null);
         await historyRepository.AddAsync(history ,cancellationToken);
         return Result<Unit>.Success(Unit.Value);
     }

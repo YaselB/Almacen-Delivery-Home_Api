@@ -51,7 +51,7 @@ namespace AlmacenApi.Aplication.Command.AdminCommand.Create
             var admin = AdminEntity.Create(request.FullName, request.UserName, hash);
             await adminRepository.AddAsync(admin, cancellationToken);
             var message = "Creando admin con nombre de usuario: "+admin.Username;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones, admin.Username ,message);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones, admin.Username ,message , null);
             await historyRepository.AddAsync(history , cancellationToken);
             return Result<Unit>.Success(Unit.Value);
         }

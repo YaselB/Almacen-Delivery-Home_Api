@@ -47,7 +47,7 @@ public class CreateProductEntityCommandHandler : CreateGenericEntityCommandHandl
                 return Result<Unit>.Failure(new UserNotFoundError());
             }
             var message = "Se ha creado un nuevo producto: "+product.name+" con un cantidad de: "+product.Quantity+product.Unity+" por el proveedor:"+command.Provider;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones ,userEntity.UserName ,message);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones ,userEntity.UserName ,message , null);
             await historyRepository.AddAsync(history , cancellationToken);
         }
         if(command.AdminId != null)
@@ -61,7 +61,7 @@ public class CreateProductEntityCommandHandler : CreateGenericEntityCommandHandl
                 return Result<Unit>.Failure(new AdminNotFoundError());
             }
             var message = "Se ha creado un nuevo producto: "+product.name+" con un cantidad de: "+product.Quantity+product.Unity+" por el proveedor: "+command.Provider;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones ,adminEntity.Username ,message);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones ,adminEntity.Username ,message , null);
             await historyRepository.AddAsync(history , cancellationToken);
         }
         return Result<Unit>.Success(Unit.Value);

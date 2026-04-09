@@ -37,7 +37,7 @@ public class UpdateUserEntityCommandHandler : UpdateGenericEntityCommandHandler<
         user.Update(hash);
         await userRepository.UpdateAsync(user , cancellationToken);
         var message = "Se ha actualizado el usuario: "+user.UserName;
-        var history = HistoryEntity.Create(HistoryEntity.Type.Modificaciones , user.UserName ,message);
+        var history = HistoryEntity.Create(HistoryEntity.Type.Modificaciones , user.UserName ,message , null);
         await historyRepository.AddAsync(history , cancellationToken);
         return Result<Unit>.Success(Unit.Value);
     }

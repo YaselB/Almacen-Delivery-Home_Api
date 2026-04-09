@@ -68,7 +68,7 @@ public class UpdateProductEntityCommandHandler : UpdateGenericEntityCommandHandl
             }
             await productRepository.UpdateAsync(product, cancellationToken);
             var message = "se ha agregado una nueva cantidad del producto: " + product.name+" ,"+command.Quantity+product.Unity+" por el proveedor:"+command.Provider;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Entrada, adminEntity.UserName, message);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Entrada, adminEntity.UserName, message , null);
             await historyRepository.AddAsync(history, cancellationToken);
         }
         if(command.UserId != null)
@@ -82,7 +82,7 @@ public class UpdateProductEntityCommandHandler : UpdateGenericEntityCommandHandl
             }
             await productRepository.UpdateAsync(product, cancellationToken);
             var message = "se ha agregado una nueva cantidad del producto: " + product.name+" ,"+command.Quantity+product.Unity+" por el proveedor:"+command.Provider;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Entrada, userEntity.UserName, message);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Entrada, userEntity.UserName, message , null);
             await historyRepository.AddAsync(history, cancellationToken);
         }
         return Result<Unit>.Success(Unit.Value);

@@ -13,4 +13,5 @@ public class CreateComboOutEntityCommand : CreateGenericEntityCommand<ComboOutEn
     public required string ? UserId { get ; set ;}
     public required List<ComboOutDto>? ComboEntity{ get ; set ;}
     public required string? Customer { get ; set ;}
+    public required DateTime ComboOutDate {get ; set;}
 }

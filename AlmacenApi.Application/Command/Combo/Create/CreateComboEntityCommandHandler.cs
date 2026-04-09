@@ -78,7 +78,7 @@ public class CreteComboEntityCommandHandler : CreateGenericEntityCommandHandler<
                 return Result<Unit>.Failure(new AdminNotFoundError());
             }
             var message = "Se ha creado un combo: "+newCombo.Name;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones , adminName.Username , message);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones , adminName.Username , message , null);
             await historyRepository.AddAsync(history , cancellationToken);
         }
         if(request.UserId != null)
@@ -105,7 +105,7 @@ public class CreteComboEntityCommandHandler : CreateGenericEntityCommandHandler<
                 return Result<Unit>.Failure(new UserNotFoundError());
             }
             var message = "Se ha creado un combo: "+newCombo.Name;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones , userName.UserName , message);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Creaciones , userName.UserName , message , null);
             await historyRepository.AddAsync(history , cancellationToken); 
         }
         return Result<Unit>.Success(Unit.Value);

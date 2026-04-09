@@ -111,7 +111,7 @@ public class UpdateComboEntityCommandHandler : UpdateGenericEntityCommandHandler
             }
             // 9. Registrar en el historial
             var message = "Se ha actualizado el combo: " + combo.Name;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Modificaciones, adminEntity.Username, message);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Modificaciones, adminEntity.Username, message , null);
             await historyRepository.AddAsync(history, cancellationToken);
         }
         if(request.UserId != null){
@@ -122,7 +122,7 @@ public class UpdateComboEntityCommandHandler : UpdateGenericEntityCommandHandler
                 return Result<Unit>.Failure(new UserNotFoundError());
             }
             var message = "Se ha actualizado el combo: " + combo.Name;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Modificaciones, userEntity.UserName, message);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Modificaciones, userEntity.UserName, message , null);
             await historyRepository.AddAsync(history, cancellationToken);
         }
         return Result<Unit>.Success(Unit.Value);

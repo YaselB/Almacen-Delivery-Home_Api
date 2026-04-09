@@ -38,7 +38,7 @@ public class UpdateAdminEntityCommandHandler : UpdateGenericEntityCommandHandler
         admin.Update(hashingPassword);
         await adminRepository.UpdateAsync(admin , cancellationToken);
         var message = "Se ha actualizado el admin: "+admin.Username;
-        var history = HistoryEntity.Create(HistoryEntity.Type.Modificaciones , admin.Username ,message);
+        var history = HistoryEntity.Create(HistoryEntity.Type.Modificaciones , admin.Username ,message , null);
         await historyRepository.AddAsync(history , cancellationToken);
         return Result<Unit>.Success(Unit.Value);
     }
