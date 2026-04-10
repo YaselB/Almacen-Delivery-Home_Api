@@ -127,8 +127,16 @@ public class CreateComboOutEntityCommandHandler
                 logger.LogWarning("El admin con id: " + request.AdminId + " no se encuentra");
                 return Result<Unit>.Failure(new AdminNotFoundError());
             }
-            var message = $"Se ha creado una salida personalizada para el combo: {combo.Name}\n";
-            message += "para el cliente:" + request.Customer + "\n Motivo de la salida: " + request.OutMotive;
+            var message = $"Se ha creado una salida para el combo: {combo.Name}\n";
+            message += "para el cliente:" + request.Customer + "\n Motivo de la salida: " + request.OutMotive+"\n Productos de la salida del combo\n";
+            foreach(var i in comboOutItems)
+            {
+                var name = products.Where(c => c.id == i.ProductId).Select(c => c.name).FirstOrDefault();
+                if(name != null)
+                {
+                    message += "Producto: "+name+" , Cantidad: "+i.Quantity+"\n";
+                }
+            }
             var comboOutDateUtc = request.ComboOutDate.Kind == DateTimeKind.Utc
     ? request.ComboOutDate
     : DateTime.SpecifyKind(request.ComboOutDate, DateTimeKind.Utc);
@@ -143,8 +151,16 @@ public class CreateComboOutEntityCommandHandler
                 logger.LogWarning("El usuario con id: " + request.UserId + " no e encuentra");
                 return Result<Unit>.Failure(new UserNotFoundError());
             }
-            var message = $"Se ha creado una salida personalizada para el combo: {combo.Name}\n";
-            message += "para el cliente:" + request.Customer + "\n Motivo de la salida: " + request.OutMotive;
+            var message = $"Se ha creado una personalizada para el combo: {combo.Name}\n";
+            message += "para el cliente:" + request.Customer + "\n Motivo de la salida: " + request.OutMotive+"\n Productos de la salida\n";
+            foreach(var i in comboOutItems)
+            {
+                var name = products.Where(c => c.id == i.ProductId).Select(c => c.name).FirstOrDefault();
+                if(name != null)
+                {
+                    message += "Producto: "+name+" , Cantidad: "+i.Quantity+"\n";
+                }
+            }
             var comboOutDateUtc = request.ComboOutDate.Kind == DateTimeKind.Utc
     ? request.ComboOutDate
     : DateTime.SpecifyKind(request.ComboOutDate, DateTimeKind.Utc);
