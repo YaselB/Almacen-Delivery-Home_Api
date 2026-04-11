@@ -40,7 +40,6 @@ namespace AlmacenApi.Infrastructure.Repository.Generic
             if (existing != null)
             {
                 _context.Entry(existing).CurrentValues.SetValues(entity);
-                existing.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync(cancellationToken);
             }
         }

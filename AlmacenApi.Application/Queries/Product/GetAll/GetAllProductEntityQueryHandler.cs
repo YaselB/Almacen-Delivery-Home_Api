@@ -30,7 +30,8 @@ public class GetAllProductEntityQueryHandler : GetAllGenericEntityQueryHandler<P
                     Quantity = i.Quantity,
                     Unity = i.Unity,
                     Category = i.Category,
-                    Provider = i.Provider
+                    Provider = i.Provider,
+                    UpdateAt = i.UpdatedAt
             };
             if(i.CreateByUser != null)
             {

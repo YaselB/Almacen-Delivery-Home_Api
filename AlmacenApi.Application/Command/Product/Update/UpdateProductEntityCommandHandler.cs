@@ -59,21 +59,21 @@ public class UpdateProductEntityCommandHandler : UpdateGenericEntityCommandHandl
         }
         if (command.AdminId != null)
         {
-            product.Update(command.Quantity, command.endDate, command.AdminId, null , command.Provider);
-            var adminEntity = await user.FindByIdAsync(command.AdminId, cancellationToken);
+            product.Update(command.Quantity, command.endDate, command.AdminId, null , command.Provider , command.DateIn);
+            var adminEntity = await admin.FindByIdAsync(command.AdminId, cancellationToken);
             if (adminEntity == null)
             {
                 logger.LogWarning("El admin con id: " + command.AdminId + " no se encuentra");
-                return Result<Unit>.Failure(new UserNotFoundError());
+                return Result<Unit>.Failure(new AdminNotFoundError());
             }
             await productRepository.UpdateAsync(product, cancellationToken);
             var message = "se ha agregado una nueva cantidad del producto: " + product.name+" ,"+command.Quantity+product.Unity+" por el proveedor:"+command.Provider;
-            var history = HistoryEntity.Create(HistoryEntity.Type.Entrada, adminEntity.UserName, message , null);
+            var history = HistoryEntity.Create(HistoryEntity.Type.Entrada, adminEntity.Username, message , null);
             await historyRepository.AddAsync(history, cancellationToken);
         }
         if(command.UserId != null)
         {
-            product.Update(command.Quantity, command.endDate, null, command.UserId , command.Provider);
+            product.Update(command.Quantity, command.endDate, null, command.UserId , command.Provider , command.DateIn);
             var userEntity = await user.FindByIdAsync(command.UserId ,cancellationToken);
             if(userEntity == null)
             {

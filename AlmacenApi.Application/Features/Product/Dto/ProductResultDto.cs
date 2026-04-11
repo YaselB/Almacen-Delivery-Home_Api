@@ -10,5 +10,6 @@ public class ProductResultDto
     public required string? NameUserorAdmin {get ; set ;}
     public required string Category { get ; set ;}
     public required string Provider {get ; set ;}
+    public required DateTime UpdateAt {get ; set ;}
     
 }

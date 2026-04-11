@@ -49,7 +49,7 @@ public class ProductEntity : GenericEntity<ProductEntity>
         product.AddDomainEvent(CreateProductDomainEvent);
         return product;
     }
-    public void Update(int Quantity , DateTime? endDate , string ? Admin , string ? UserId , string Provider)
+    public void Update(int Quantity , DateTime? endDate , string ? Admin , string ? UserId , string Provider , DateTime date)
     {
         this.Quantity = Quantity;
         if(endDate != null){
@@ -65,7 +65,7 @@ public class ProductEntity : GenericEntity<ProductEntity>
             this.CreateByUser = UserId;
             this.CreateByAdmin = null;
         }
-        this.UpdatedAt = DateTime.UtcNow;
+        this.UpdatedAt = date;
         this.Provider = Provider;
         var UpdateProductDomainEvent = new ProductUpdateEvent(this.id ,this.name);
         this.AddDomainEvent(UpdateProductDomainEvent);

@@ -9,4 +9,5 @@ public class UpdateProductEntityCommand : UpdateGenericEntityCommand<ProductEnti
     public required string? AdminId {get; set ;}
     public required string? UserId { get ; set ;}
     public required string Provider { get ; set ;}
+    public required DateTime DateIn {get ; set ;}
 }
