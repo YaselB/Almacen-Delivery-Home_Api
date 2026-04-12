@@ -92,7 +92,14 @@ public class CreateComboOutEntityCommandHandler
                 continue;
             }
             // Descontar stock
-            product.Quantity -= item.Quantity;
+            if(request.QuantityToQuit != null)
+            {
+               product.Quantity -= item.Quantity * request.QuantityToQuit.Value; 
+            }
+            if(request.QuantityToQuit == null)
+            {
+                product.Quantity -= item.Quantity;
+            }
             await productRepository.UpdateAsync(product, cancellationToken);
         }
 
