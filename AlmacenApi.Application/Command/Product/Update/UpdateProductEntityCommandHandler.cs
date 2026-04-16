@@ -59,6 +59,7 @@ public class UpdateProductEntityCommandHandler : UpdateGenericEntityCommandHandl
         }
         if (command.AdminId != null)
         {
+            var productsQuantityOld = command.Quantity - product.Quantity;
             product.Update(command.Quantity, command.endDate, command.AdminId, null , command.Provider , command.DateIn);
             var adminEntity = await admin.FindByIdAsync(command.AdminId, cancellationToken);
             if (adminEntity == null)
@@ -67,12 +68,13 @@ public class UpdateProductEntityCommandHandler : UpdateGenericEntityCommandHandl
                 return Result<Unit>.Failure(new AdminNotFoundError());
             }
             await productRepository.UpdateAsync(product, cancellationToken);
-            var message = "se ha agregado una nueva cantidad del producto: " + product.name+" ,"+command.Quantity+product.Unity+" por el proveedor:"+command.Provider;
+            var message = "se ha agregado una nueva cantidad del producto: " + product.name+"\n ,cantidad: "+productsQuantityOld+product.Unity+"\n por el proveedor:"+command.Provider+" ,\nixnueva cantidad :"+command.Quantity;
             var history = HistoryEntity.Create(HistoryEntity.Type.Entrada, adminEntity.Username, message , null);
             await historyRepository.AddAsync(history, cancellationToken);
         }
         if(command.UserId != null)
         {
+            var productsQuantityOld = command.Quantity - product.Quantity;
             product.Update(command.Quantity, command.endDate, null, command.UserId , command.Provider , command.DateIn);
             var userEntity = await user.FindByIdAsync(command.UserId ,cancellationToken);
             if(userEntity == null)
@@ -81,7 +83,7 @@ public class UpdateProductEntityCommandHandler : UpdateGenericEntityCommandHandl
                 return Result<Unit>.Failure(new AdminNotFoundError());
             }
             await productRepository.UpdateAsync(product, cancellationToken);
-            var message = "se ha agregado una nueva cantidad del producto: " + product.name+" ,"+command.Quantity+product.Unity+" por el proveedor:"+command.Provider;
+            var message = "se ha agregado una nueva cantidad del producto: " + product.name+" ,"+productsQuantityOld+product.Unity+" por el proveedor:"+command.Provider+" ,nueva cantidad :"+command.Quantity;
             var history = HistoryEntity.Create(HistoryEntity.Type.Entrada, userEntity.UserName, message , null);
             await historyRepository.AddAsync(history, cancellationToken);
         }

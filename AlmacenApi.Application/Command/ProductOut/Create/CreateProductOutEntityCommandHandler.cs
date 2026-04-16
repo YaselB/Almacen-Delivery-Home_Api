@@ -78,7 +78,7 @@ public class CreateProductOutEntityCommandHandler : CreateGenericEntityCommandHa
             double QuantityToQuit = request.Products.Where(o => o.Id == i.id).Select(e => e.Quantity).FirstOrDefault();
             i.Quantity -= QuantityToQuit;
             await productRepository.UpdateAsync(i, cancellationToken);
-            ProductsAndQuantitiesMessage += "Producto: " + i.name + " , cantidad: " + QuantityToQuit + "\n";
+            ProductsAndQuantitiesMessage += "Producto: " + i.name + " , cantidad: " + QuantityToQuit +" , cantidad restante: "+i.Quantity+ "\n";
             var ProductOut = ProductOutEntity.Create(request.UserId, request.AdminId, i.name, QuantityToQuit, request.OutMotive, i.id, request.Customer);
             newProducts.Add(ProductOut);
         }

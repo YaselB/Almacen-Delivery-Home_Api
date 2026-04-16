@@ -139,9 +139,10 @@ public class CreateComboOutEntityCommandHandler
             foreach(var i in comboOutItems)
             {
                 var name = products.Where(c => c.id == i.ProductId).Select(c => c.name).FirstOrDefault();
+                var quantity = products.Where(c => c.id == i.ProductId).Select(c => c.Quantity).FirstOrDefault();
                 if(name != null)
                 {
-                    message += "Producto: "+name+" , Cantidad: "+i.Quantity+"\n";
+                    message += "Producto: "+name+" , Cantidad: "+i.Quantity+" , Cantidad Restante: "+quantity+"\n";
                 }
             }
             var comboOutDateUtc = request.ComboOutDate.Kind == DateTimeKind.Utc
@@ -163,9 +164,10 @@ public class CreateComboOutEntityCommandHandler
             foreach(var i in comboOutItems)
             {
                 var name = products.Where(c => c.id == i.ProductId).Select(c => c.name).FirstOrDefault();
+                var quantity = products.Where(c => c.id == i.ProductId).Select(c => c.Quantity).FirstOrDefault();
                 if(name != null)
                 {
-                    message += "Producto: "+name+" , Cantidad: "+i.Quantity+"\n";
+                    message += "Producto: "+name+" , Cantidad: "+i.Quantity+" , Cantidad Restante: "+quantity+"\n";
                 }
             }
             var comboOutDateUtc = request.ComboOutDate.Kind == DateTimeKind.Utc
